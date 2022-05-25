@@ -1,9 +1,20 @@
 <html> 
-<head><title>Students Record</title>
+<head>
+<title>Students Record</title>
 <link rel="stylesheet" href="/esecforte/bootstrap-3.4.1-dist/css/bootstrap.css">
 </head>
 <?php
-	//$oc=0;
+
+	if(!isset($_GET["oc"]))
+	{ 
+		$oc="desc";	
+		//echo $oc." isset";
+	}
+	else
+	{ 
+		$oc=$_GET["oc"]; 
+		//echo "while pgination ".$oc;	
+	}	
 	
 	if(!isset($_GET["t1"]))
 	{
@@ -16,24 +27,24 @@
 		$V=$_GET["t1"];
 	}
 
-	/*if(isset($_GET["Sort"]))
+	if(!isset($_GET["Sort"]))
 	{
-		if($_GET["s"]==0)
-		{
-		if($oc==0)
-		{$oc=1;}
-		else
-		{$oc=0;}
-		}
-
-	}	
+		$sor="";
+	}
 	else 
 	{
-		if(!isset($_GET["oc"]))
-		{ $oc=0;	}
+		$sor=$_GET["Sort"];
+		$oc=$_GET["oc"];
+		//echo $oc." in sort";
+		if($oc=="desc")
+		{
+			$oc="asc"; //echo $oc." in if";
+		}
 		else
-		{$oc=$_GET["oc"];}
-	}*/
+		{
+			$oc="desc"; //echo $oc." in else";
+		}
+	}	
 ?>
 <Body style="background-color: #dda;">	
 
@@ -57,7 +68,7 @@
 <table class="table table-hover" style="background-color: white; margin-right:25px;">
 <tr style="font-weight: bold;">
 	<td>ID</td>
-	<td><a href="Student1.php?Sort=S">Name</a></td><?php // &s=0&oc= echo $oc?>
+	<td><a href="Student1.php?Sort=S&oc=<?php echo $oc ?>">Name</a></td>
 	<td>DOB</td><td>Class</td><td>Fees</td><td>Email</td><td>Contact</td><td>Address</td>
 </tr>
 
@@ -70,25 +81,16 @@
 //===========Getting the GeT parameters to get the page values==============
 	if(!isset($_GET["Inbox"]))
 	{
-		$in="";
+		$in="";							//parameter for all records
 	}
 	else
 	{
 		$in=$_GET["Inbox"];
-	} 
-	
-	if(!isset($_GET["Sort"]))
-	{
-		$sor="";
-	}
-	else 
-	{
-		$sor=$_GET["Sort"];
-	}	
+	} 		
 	
 	if(!isset($_GET["s"]))
  	{
- 		$s=0;
+ 		$s=0;							//parameter for Flagging sort while in pagination
  	}
  	else
  	{
@@ -97,14 +99,14 @@
 	
 	if (!isset ($_GET["page"]) ) 
 	{  
-        $page = 1;  
+        $page = 1;  					//Getting page numbers for applying pagination
     } 
     else 
     {  
         $page = $_GET["page"]; 
     }
  	
-//==============deletion of records ===========   
+//===============================deletion of records ======================================   
 	
 	if(isset($_GET["delete"]))
 	{	
@@ -123,17 +125,20 @@
 			}
 		}
 		else
-		{$err="Please enter Id;";}
+		{
+			$err="Please enter Id;";
+		}
 	}
-//===========insertion and validation logic:===========================================
+//=============================insertion and validation logic:================================
 	$flag=0;	$flag1=0;
-	if(isset($_POST["Insert"])||isset($_POST["Upd"]))
-{
-	
+
+if(isset($_POST["Insert"])||isset($_POST["Upd"]))
+{	
+	//Basic Validations==================================================================
 	if(is_numeric($_POST["t3"])&&!empty($_POST["t4"])&&is_numeric($_POST["t6"])&&$_POST["t6"]>0&&$_POST["t6"]<=12&&is_numeric($_POST["t7"])&&$_POST["t7"]>0&&$_POST["t7"]<=1200&&!empty($_POST["t8"])&&strpos($_POST["t8"],"@")!=""&&strpos($_POST["t8"],".com")!=""&&is_numeric($_POST["t9"])&&strlen($_POST["t9"])==10&&!empty($_POST["t10"]))
 	{
-//Date Validation===		
-if(is_numeric(substr($_POST["t5"],0,4))&&is_numeric(substr($_POST["t5"],5,2))&&is_numeric(substr($_POST["t5"],8,2)))
+//==============================Date Validation==========================================		
+	if(is_numeric(substr($_POST["t5"],0,4))&&is_numeric(substr($_POST["t5"],5,2))&&is_numeric(substr($_POST["t5"],8,2)))
 	{	
 		$yy=intval(substr($_POST["t5"],0,4));
 		$mm=intval(substr($_POST["t5"],5,2));
@@ -156,11 +161,11 @@ if(is_numeric(substr($_POST["t5"],0,4))&&is_numeric(substr($_POST["t5"],5,2))&&i
 		$err="Please enter the date in the given format:";
 	}
 //==========================Email and iD unique check validation=======================
-$flag=0;
-if(isset($_POST["Insert"]))	
-{	
-	if($flag1==0)
-	{
+	$flag=0;
+	if(isset($_POST["Insert"]))	
+	{	
+		if($flag1==0)
+		{
 		$res=mysqli_query($conn,"select Stu_id, email from student");
 		if(mysqli_num_rows($res)>0)
 		{
@@ -180,14 +185,14 @@ if(isset($_POST["Insert"]))
 				}
 			}
 		}
-	}
-}	
-	
+		}
+	}	
+//Email uniqueness and correct id check for update operation===============================	
 	if(isset($_POST["Upd"]))
 	{
 		
-if($flag1==0)
-{	
+	if($flag1==0)
+	{	
 	$res=mysqli_query($conn,"select Stu_id from student where Stu_id in(".$_POST["t3"].")");
 	if(mysqli_num_rows($res)==1)
 	{
@@ -207,14 +212,10 @@ if($flag1==0)
 		$flag=1;
 		$err="No record exist by this Id.";
 	}
-}
-		
-	/*	if($flag==1&&$err=="ID should be unique")
-		{	$flag=0;	}
-		if($flag==1&&$err=="Email should be unique:")
-		{	$flag=1;	$err= "Id no ".$_POST["t3"]." is not available to update";		}	*/
 	}
-//====================================================================Insertion
+		
+	}
+//========================================Insertion and Updation==============================
 		if($flag!=1&&$flag1!=1)
 		{
 			if(isset($_POST["Insert"]))	
@@ -235,44 +236,54 @@ if($flag1==0)
 		}
 	}
 	else
-	{	if(empty($_POST["t3"]))
+	{	
+		if(empty($_POST["t3"]))
 		{$err="ID cannot be blank";}
-		if(!empty($_POST["t3"])&&!is_numeric($_POST["t3"]))
+
+		else if(!empty($_POST["t3"])&&!is_numeric($_POST["t3"]))
 		{$err="ID Must be Numeric";}
 		
-		if(empty($_POST["t4"]))
+		else if(empty($_POST["t4"]))
 		{$err="Name cannot be blank";}
 		
-		if(empty($_POST["t6"]))
+		else if(empty($_POST["t6"]))
 		{$err="class cannot be blank";}
-		if(!empty($_POST["t6"])&&!is_numeric($_POST["t6"]))
+
+		else if(!empty($_POST["t6"])&&!is_numeric($_POST["t6"]))
 		{$err="class must be numeric";}
-		if(!empty($_POST["t6"])&&is_numeric($_POST["t6"])&&$_POST["t6"]>12&&$_POST["t6"]<1) 
+
+	else if(!empty($_POST["t6"])&&is_numeric($_POST["t6"])&&$_POST["t6"]>12&&$_POST["t6"]<1) 
 		{$err="Value of class in not in range";}
 
-		if(empty($_POST["t7"]))
+		else if(empty($_POST["t7"]))
 		{$err="Fee cannot be blank";}
-		if(!empty($_POST["t7"])&&!is_numeric($_POST["t7"]))
+
+		else if(!empty($_POST["t7"])&&!is_numeric($_POST["t7"]))
 		{$err="Vaule of fees must be numeric";}
-		if(!empty($_POST["t7"])&&is_numeric($_POST["t7"])&&$_POST["t7"]>1200&&$_POST["t7"]<100) 
+
+	else if(!empty($_POST["t7"])&&is_numeric($_POST["t7"])&&$_POST["t7"]>1200&&$_POST["t7"]<100) 
 		{$err="Value of Fee in not in range";}
 		
-		if(empty($_POST["t8"]))							
+		else if(empty($_POST["t8"]))							
 		{$err="Email cannot be empty";}
-		if(!empty($_POST["t8"])&&strpos($_POST["t8"],"@")=="")
+
+		else if(!empty($_POST["t8"])&&strpos($_POST["t8"],"@")=="")
 		{ $err="@ is missing in email. invalid email";}
-		if(!empty($_POST["t8"])&&strpos($_POST["t8"],".com")=="")
+
+		else if(!empty($_POST["t8"])&&strpos($_POST["t8"],".com")=="")
 		{ $err=".com is missing. invalid email.";} 
 
-
-		if(empty($_POST["t9"]))							
+		else if(empty($_POST["t9"]))							
 		{$err="Mobile cannot be empty";}
-		if(!empty($_POST["t9"])&&!is_numeric($_POST["t9"]))
+
+		else if(!empty($_POST["t9"])&&!is_numeric($_POST["t9"]))
 		{ $err="Mobile must be numeric";}
-		if(!empty($_POST["t9"])&&is_numeric($_POST["t9"])&&strlen($_POST["t9"])>10)
+
+		else if(!empty($_POST["t9"])&&is_numeric($_POST["t9"])&&strlen($_POST["t9"])>10)
 		{ $err="Mobile digits cannot be greter than 10";} 
 		
-		if(empty($_POST["t10"]))
+		else
+		//if(empty($_POST["t10"]))
 		{$err="Address cannot be blank";}
 	}
 }
@@ -292,10 +303,19 @@ if($flag1==0)
 		
 	if($s==1||$sor=="S")
 	{	
-	//if($oc==0){
+		//echo $oc."uut";	
+	if($oc=="asc")
+	{
+	
 	$res=mysqli_query($conn,"select * from student order by name limit ".$limitclauseI.",".$res_per_page);
-	//}else{
-//$res=mysqli_query($conn,"select * from student order by name desc limit ".$limitclauseI.",".$res_per_page);}
+	
+	}
+	else
+	{
+		//echo $s."===ch===";
+$res=mysqli_query($conn,"select * from student order by name desc limit ".$limitclauseI.",".$res_per_page);
+	
+	}
 		$s=1;
 	}		
 	else if(empty($_GET["t1"])||$in=="Al")
@@ -333,7 +353,8 @@ if($flag1==0)
 	{
 		$err="No Student By Name ".$_GET["t1"];
 	}
-}
+	
+	}
 	else
 	{	
 		$err="No Record Exist: Please Try Again!";
@@ -341,31 +362,35 @@ if($flag1==0)
 ?>
 </table>
 <div class="panel-footer">
-	<h6 style="color: red; text-align: center;"><?php echo $err ?></h6>
+<h6 style="color: red; text-align: center;"><?php echo $err ?></h6>
 </div>
+<!-- pagination navigation bar is implemented in the panel-->
+
 <nav aria-label="Page navigation" style="height: 40px;">
 <ul class="pagination" style="margin-top: 2px;">
 <li>
-    <a href="Student1.php?page=<?php echo ($page-1)?>&s=<?php echo $s?>" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-    </a>
+<a href="Student1.php?page=<?php echo ($page-1)?>&s=<?php echo $s?>" aria-label="Previous">
+<span aria-hidden="true">&laquo;</span>
+</a>
 </li>
 <?php
 //Printing the links for Pagination to occur:===============================
 $page1=$page;
 for($page=1;$page<=$no_of_page;$page++)
 	{ 
-		echo '<li><a href = "Student1.php?page='.$page.'&s='.$s.'">'.$page.'</a></li>';
+		echo '<li><a href = "Student1.php?page='.$page.'&s='.$s.'&oc='.$oc.'">'.$page.'</a></li>';
 	}
 ?>
+
 <li>
-	<a href="Student1.php?page=<?php echo ($page1+1)?>&s=<?php echo $s?>" aria-label="Next">
-	<span aria-hidden="true">&raquo;</span>
+<a href="Student1.php?page=<?php echo ($page1+1)?>&s=<?php echo $s?>" aria-label="Next">
+<span aria-hidden="true">&raquo;</span>
 </a>
 </li>
 </ul>
 </nav>
-</div>
+</div><!--Closing of panel -->
+
 <nav class="navbar navbar-default">
 <div class="container-fluid">
 	  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
