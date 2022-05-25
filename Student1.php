@@ -135,7 +135,7 @@
 if(isset($_POST["Insert"])||isset($_POST["Upd"]))
 {	
 	//Basic Validations==================================================================
-	if(is_numeric($_POST["t3"])&&!empty($_POST["t4"])&&is_numeric($_POST["t6"])&&$_POST["t6"]>0&&$_POST["t6"]<=12&&is_numeric($_POST["t7"])&&$_POST["t7"]>0&&$_POST["t7"]<=1200&&!empty($_POST["t8"])&&strpos($_POST["t8"],"@")!=""&&strpos($_POST["t8"],".com")!=""&&is_numeric($_POST["t9"])&&strlen($_POST["t9"])==10&&!empty($_POST["t10"]))
+	if(is_numeric($_POST["t3"])&&!empty($_POST["t4"])&&!empty($_POST["t5"])&&is_numeric($_POST["t6"])&&$_POST["t6"]>0&&$_POST["t6"]<=12&&is_numeric($_POST["t7"])&&$_POST["t7"]>0&&$_POST["t7"]<=1200&&!empty($_POST["t8"])&&strpos($_POST["t8"],"@")!=""&&strpos($_POST["t8"],".com")!=""&&is_numeric($_POST["t9"])&&strlen($_POST["t9"])==10&&!empty($_POST["t10"]))
 	{
 //==============================Date Validation==========================================		
 	if(is_numeric(substr($_POST["t5"],0,4))&&is_numeric(substr($_POST["t5"],5,2))&&is_numeric(substr($_POST["t5"],8,2)))
@@ -246,6 +246,9 @@ if(isset($_POST["Insert"])||isset($_POST["Upd"]))
 		else if(empty($_POST["t4"]))
 		{$err="Name cannot be blank";}
 		
+		else if(empty($_POST["t5"]))
+		{$err="date cannot be blank";}
+			
 		else if(empty($_POST["t6"]))
 		{$err="class cannot be blank";}
 
@@ -369,7 +372,7 @@ $res=mysqli_query($conn,"select * from student order by name desc limit ".$limit
 <nav aria-label="Page navigation" style="height: 40px;">
 <ul class="pagination" style="margin-top: 2px;">
 <li>
-<a href="Student1.php?page=<?php echo ($page-1)?>&s=<?php echo $s?>" aria-label="Previous">
+<a href="Student1.php?page=<?php echo ($page-1)?>&s=<?php echo $s?>&oc=<?php echo $oc?>" aria-label="Previous">
 <span aria-hidden="true">&laquo;</span>
 </a>
 </li>
@@ -383,7 +386,7 @@ for($page=1;$page<=$no_of_page;$page++)
 ?>
 
 <li>
-<a href="Student1.php?page=<?php echo ($page1+1)?>&s=<?php echo $s?>" aria-label="Next">
+<a href="Student1.php?page=<?php echo ($page1+1)?>&s=<?php echo $s?>&oc=<?php echo $oc?>" aria-label="Next">
 <span aria-hidden="true">&raquo;</span>
 </a>
 </li>
